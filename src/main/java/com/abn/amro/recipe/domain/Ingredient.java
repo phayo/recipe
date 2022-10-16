@@ -7,11 +7,17 @@ import javax.persistence.Id;
 
 @Entity
 public class Ingredient {
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Long id;
     private String name;
     private String variation;
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String unit;
+    private double quantity;
+
+    public Ingredient() {
+
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -21,8 +27,32 @@ public class Ingredient {
         return id;
     }
 
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getVariation() {
+        return variation;
     }
 
     public void setVariation(String variation) {
@@ -36,20 +66,22 @@ public class Ingredient {
 
         Ingredient that = (Ingredient) o;
 
-        return id.equals(that.id);
+        return name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return name.hashCode();
     }
 
     @Override
     public String toString() {
         return "Ingredient{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", variation='" + variation + '\'' +
-                ", id=" + id +
+                ", unit='" + unit + '\'' +
+                ", quantity=" + quantity +
                 '}';
     }
 }

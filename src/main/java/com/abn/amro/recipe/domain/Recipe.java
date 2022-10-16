@@ -2,7 +2,6 @@ package com.abn.amro.recipe.domain;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -20,17 +19,17 @@ public class Recipe {
 
     private String name;
 
-    @OneToMany
-    private Set<IngredientQuantity> ingredient;
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true, targetEntity=Ingredient.class)
+    private List<Ingredient> ingredient;
 
     private int noOfServing;
 
     private int servingSize;
 
+    @Enumerated(EnumType.STRING)
     private RecipeType type;
 
-    @ElementCollection
-    private List<String> instructions;
+    private String instructions;
 
     public Long getId() {
         return id;
@@ -48,11 +47,11 @@ public class Recipe {
         this.name = name;
     }
 
-    public Set<IngredientQuantity> getIngredient() {
+    public List<Ingredient> getIngredient() {
         return ingredient;
     }
 
-    public void setIngredient(Set<IngredientQuantity> ingredient) {
+    public void setIngredient(List<Ingredient> ingredient) {
         this.ingredient = ingredient;
     }
 
@@ -80,11 +79,11 @@ public class Recipe {
         this.type = type;
     }
 
-    public List<String> getInstructions() {
+    public String getInstructions() {
         return instructions;
     }
 
-    public void setInstructions(List<String> instructions) {
+    public void setInstructions(String instructions) {
         this.instructions = instructions;
     }
 
