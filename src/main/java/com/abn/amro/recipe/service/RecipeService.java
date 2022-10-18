@@ -5,10 +5,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public interface RecipeService {
-    List<RecipeDTO> searchRecipe(String searchString);
-    void createRecipe(RecipeDTO recipeDTO);
+    Set<RecipeDTO> searchRecipe(String searchString);
+    RecipeDTO createRecipe(RecipeDTO recipeDTO);
     List<RecipeDTO> findAllRecipe(Pageable pageable);
+    RecipeDTO fineOneRecipe(Long id);
 }

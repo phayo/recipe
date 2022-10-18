@@ -17,7 +17,7 @@ public class RecipeSpecification implements Specification<Recipe> {
     }
 
     @Override
-    public Predicate toPredicate(Root<Recipe> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<Recipe> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         boolean isIngredient = false;
         Join<Recipe, Ingredient> ingredientJoin = root.join("ingredient");
         String ingredientProperty = "";
@@ -28,21 +28,21 @@ public class RecipeSpecification implements Specification<Recipe> {
 
         switch (criteria.getOperation()) {
             case EQUALITY:
-                return criteriaBuilder.equal(isIngredient ? ingredientJoin.get(ingredientProperty) : root.get(criteria.getKey()), criteria.getValue());
+                return cb.equal(isIngredient ? cb.lower(ingredientJoin.get(ingredientProperty)) : cb.lower(root.get(criteria.getKey())), criteria.getValue());
             case NEGATION:
-                return criteriaBuilder.notEqual(isIngredient ? ingredientJoin.get(ingredientProperty) : root.get(criteria.getKey()), criteria.getValue());
+                return cb.notEqual(isIngredient ? cb.lower(ingredientJoin.get(ingredientProperty)) : cb.lower(root.get(criteria.getKey())), criteria.getValue());
             case GREATER_THAN:
-                return criteriaBuilder.greaterThan(isIngredient ? ingredientJoin.get(ingredientProperty) : root.get(criteria.getKey()), criteria.getValue().toString());
+                return cb.greaterThan(isIngredient ? cb.lower(ingredientJoin.get(ingredientProperty)) : cb.lower(root.get(criteria.getKey())), criteria.getValue().toString());
             case LESS_THAN:
-                return criteriaBuilder.lessThan(isIngredient ? ingredientJoin.get(ingredientProperty) : root.get(criteria.getKey()), criteria.getValue().toString());
+                return cb.lessThan(isIngredient ? cb.lower(ingredientJoin.get(ingredientProperty)) : cb.lower(root.get(criteria.getKey())), criteria.getValue().toString());
             case LIKE:
-                return criteriaBuilder.like(isIngredient ? ingredientJoin.get(ingredientProperty) : root.get(criteria.getKey()), criteria.getValue().toString());
+                return cb.like(isIngredient ? cb.lower(ingredientJoin.get(ingredientProperty)) : cb.lower(root.get(criteria.getKey())), criteria.getValue().toString());
             case STARTS_WITH:
-                return criteriaBuilder.like(isIngredient ? ingredientJoin.get(ingredientProperty) : root.get(criteria.getKey()), criteria.getValue() + "%");
+                return cb.like(isIngredient ? cb.lower(ingredientJoin.get(ingredientProperty)) : cb.lower(root.get(criteria.getKey())), criteria.getValue() + "%");
             case ENDS_WITH:
-                return criteriaBuilder.like(isIngredient ? ingredientJoin.get(ingredientProperty) : root.get(criteria.getKey()), "%" + criteria.getValue());
+                return cb.like(isIngredient ? cb.lower(ingredientJoin.get(ingredientProperty)) : cb.lower(root.get(criteria.getKey())), "%" + criteria.getValue());
             case CONTAINS:
-                return criteriaBuilder.like(isIngredient ? ingredientJoin.get(ingredientProperty) : root.get(criteria.getKey()), "%" + criteria.getValue() + "%");
+                return cb.like(isIngredient ? cb.lower(ingredientJoin.get(ingredientProperty)) : cb.lower(root.get(criteria.getKey())), "%" + criteria.getValue() + "%");
             default:
                 return null;
         }

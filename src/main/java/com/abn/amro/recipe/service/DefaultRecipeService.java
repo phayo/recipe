@@ -6,19 +6,24 @@ import com.abn.amro.recipe.domain.Recipe;
 import com.abn.amro.recipe.domain.RecipeType;
 import com.abn.amro.recipe.domain.spec.SearchOperation;
 import com.abn.amro.recipe.domain.spec.SpecificationBuilder;
+import com.abn.amro.recipe.resource.exception.ResourceNotFoundException;
 import com.abn.amro.recipe.service.dto.IngredientDTO;
 import com.abn.amro.recipe.service.dto.RecipeDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 public class DefaultRecipeService implements RecipeService{
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultRecipeService.class);
 
     private final RecipeRepository recipeRepository;
 
@@ -29,10 +34,11 @@ public class DefaultRecipeService implements RecipeService{
     private final Pattern p = Pattern.compile("[^a-zA-Z0-9 ]");
 
     @Override
-    public List<RecipeDTO> searchRecipe(String searchString) {
+    public Set<RecipeDTO> searchRecipe(String searchString) {
+        LOG.info("Searching recipes that meet search term {}", searchString);
         SpecificationBuilder builder = new SpecificationBuilder();
-        String operationSetExper = String.join("|", SearchOperation.SIMPLE_OPERATION_SET);
-        String s = "(\\w+?)("+ operationSetExper +")(\\p{Punct}?)(\\w+?)(\\p{Punct}?),";
+        String operationSetExpr = String.join("|", SearchOperation.SIMPLE_OPERATION_SET);
+        String s = "(\\w+?)("+ operationSetExpr +")(\\p{Punct}?)(\\w+?)(\\p{Punct}?),";
         Pattern pattern = Pattern.compile(s);
         Matcher matcher = pattern.matcher(searchString + ",");
         while (matcher.find()) {
@@ -45,20 +51,30 @@ public class DefaultRecipeService implements RecipeService{
         }
 
         Specification<Recipe> spec = builder.build();
-        return recipeRepository.findAll(spec).stream().map(this::toDTO).collect(Collectors.toList());
+        return recipeRepository.findAll(spec).stream().map(this::toDTO).collect(Collectors.toSet());
     }
 
-    public void createRecipe(final RecipeDTO recipeDTO){
+    public RecipeDTO createRecipe(final RecipeDTO recipeDTO){
         checkPreconditions(recipeDTO);
         Recipe recipe = createEntity(recipeDTO);
-        recipeRepository.save(recipe);
+        return toDTO(recipeRepository.save(recipe));
+    }
+
+    public RecipeDTO fineOneRecipe(Long id){
+        return toDTO(recipeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Recipe with id "+ id + " does not exist.")));
     }
 
     public List<RecipeDTO> findAllRecipe(Pageable pageable){
-        return recipeRepository.findAll(pageable).stream().map(this::toDTO).collect(Collectors.toList());
+        LOG.info("Getting paged recipes response. Page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
+        List<RecipeDTO> recipes = recipeRepository.findAll(pageable).stream().map(this::toDTO).collect(Collectors.toList());
+
+        if(recipes.isEmpty()) throw new ResourceNotFoundException("Recipes not found");
+
+        return recipes;
     }
 
-    private void checkPreconditions(RecipeDTO recipeDTO) {
+    protected void checkPreconditions(RecipeDTO recipeDTO) {
+        LOG.info("Checking preconditions for creating recipe");
         if(p.matcher(recipeDTO.getName()).find() || recipeDTO.getName().isEmpty()) throw new IllegalArgumentException("Recipe name should not be empty or contain illegal characters");
         if(recipeDTO.getNoOfServing() < 0 || recipeDTO.getServingSize() < 0) throw new IllegalArgumentException("Number of serving and serving size should not be less than 0.");
 
@@ -69,15 +85,15 @@ public class DefaultRecipeService implements RecipeService{
         }
 
         recipeDTO.getIngredient().forEach(ingredient -> {
-            if(ingredient.getName().isEmpty() || p.matcher(recipeDTO.getName()).find()) throw new IllegalArgumentException("ingredient name should not be empty or contain illegal characters");
+            if(ingredient.getName().isEmpty() || p.matcher(ingredient.getName()).find()) throw new IllegalArgumentException("ingredient name should not be empty or contain illegal characters");
             if(ingredient.getQuantity() < 0) throw  new IllegalArgumentException("Ingredient quantity should not be less than 0");
         });
     }
 
-    private Recipe createEntity(RecipeDTO recipeDTO) {
+    protected Recipe createEntity(RecipeDTO recipeDTO) {
         Recipe recipe = new Recipe();
         recipe.setInstructions(recipeDTO.getInstructions());
-        recipe.setName(recipeDTO.getName().toLowerCase());
+        recipe.setName(recipeDTO.getName());
         recipe.setServingSize(recipeDTO.getServingSize());
         recipe.setNoOfServing(recipeDTO.getNoOfServing());
         recipe.setName(recipeDTO.getName());
@@ -86,14 +102,14 @@ public class DefaultRecipeService implements RecipeService{
             Ingredient quantity = new Ingredient();
             quantity.setUnit(ingredientDTO.getUnit());
             quantity.setQuantity(ingredientDTO.getQuantity());
-            quantity.setName(ingredientDTO.getName().toLowerCase());
+            quantity.setName(ingredientDTO.getName());
             quantity.setVariation(ingredientDTO.getVariation());
             return quantity;
         }).collect(Collectors.toList()));
         return recipe;
     }
 
-    private RecipeDTO toDTO(Recipe recipe) {
+    protected RecipeDTO toDTO(Recipe recipe) {
         RecipeDTO recipeDTO = new RecipeDTO();
         recipeDTO.setInstructions(recipe.getInstructions());
         recipeDTO.setName(recipe.getName());
