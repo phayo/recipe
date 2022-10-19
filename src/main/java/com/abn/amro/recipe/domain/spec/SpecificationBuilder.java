@@ -53,8 +53,8 @@ public class SpecificationBuilder {
     }
 
     public Specification<Recipe> build() {
-        if (params.size() == 0) {
-            return null;
+        if (params == null ||params.size() == 0) {
+            throw new IllegalArgumentException("One or more search term or token incorrect, review supplied searchTerm and token.");
         }
 
         Specification<Recipe> result = new RecipeSpecification(params.get(0));

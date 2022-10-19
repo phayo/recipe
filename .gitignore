@@ -31,3 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/h2db/db/recipe_test.mv.db

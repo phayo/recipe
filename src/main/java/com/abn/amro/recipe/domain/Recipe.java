@@ -19,7 +19,7 @@ public class Recipe {
 
     private String name;
 
-    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true, targetEntity=Ingredient.class)
+    @OneToMany(cascade = {CascadeType.PERSIST}, orphanRemoval = true, targetEntity=Ingredient.class)
     private List<Ingredient> ingredient;
 
     private int noOfServing;
