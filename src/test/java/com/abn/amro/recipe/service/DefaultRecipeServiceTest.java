@@ -1,7 +1,9 @@
 package com.abn.amro.recipe.service;
 
 import com.abn.amro.recipe.dao.RecipeRepository;
+import com.abn.amro.recipe.domain.Ingredient;
 import com.abn.amro.recipe.domain.Recipe;
+import com.abn.amro.recipe.domain.RecipeType;
 import com.abn.amro.recipe.service.dto.IngredientDTO;
 import com.abn.amro.recipe.service.dto.RecipeDTO;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,6 +49,34 @@ class DefaultRecipeServiceTest {
         recipeDTO.setIngredient(List.of(ingredient2, ingredient));
 
         return recipeDTO;
+    }
+
+    private Recipe getRecipe(){
+        Recipe recipe = new Recipe();
+        recipe.setType(RecipeType.VEGAN);
+        recipe.setName("Recipe");
+        recipe.setNoOfServing(5);
+        recipe.setServingSize(32);
+        recipe.setInstructions("Cook in the oven");
+
+        Ingredient ingredient = new Ingredient();
+        ingredient.setName("Ingredient 1");
+        ingredient.setVariation("Variation 1");
+        ingredient.setUnit("Unit 1");
+        ingredient.setQuantity(4);
+
+        Ingredient ingredient2 = new Ingredient();
+        ingredient2.setName("Ingredient 2");
+        ingredient2.setVariation("Variation 2");
+        ingredient2.setUnit("Unit 2");
+        ingredient2.setQuantity(34);
+
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        ingredients.add(ingredient2);
+        ingredients.add(ingredient);
+        recipe.setIngredient(ingredients);
+
+        return recipe;
     }
 
     @Test
@@ -111,4 +142,72 @@ class DefaultRecipeServiceTest {
         assertEquals(recipe.getIngredient().get(0).getQuantity(), dto1.getIngredient().get(0).getQuantity());
         assertEquals(recipe.getIngredient().get(0).getVariation(), dto1.getIngredient().get(0).getVariation());
     }
+
+    @Test
+    void updateRecipeProps_shouldThrowError_onWrongInput(){
+        RecipeDTO recipeDTO = getRecipeDTO();
+        Recipe recipe = getRecipe();
+
+        recipeDTO.setName("*****");
+        assertThrows(IllegalArgumentException.class, () -> defaultRecipeService.updateRecipeProps(recipeDTO, recipe));
+
+        recipeDTO.setName("A vid name");
+        recipeDTO.setType("UNSUPPORTED");
+        assertThrows(IllegalArgumentException.class, () -> defaultRecipeService.updateRecipeProps(recipeDTO, recipe));
+    }
+
+    @Test
+    void updateRecipeProps_shouldUpdateRecipe_onCorrectInput(){
+        RecipeDTO recipeDTO = getRecipeDTO();
+        Recipe recipe = getRecipe();
+
+        recipeDTO.setName("A valid name");
+        recipeDTO.setType("VEGETARIAN");
+        recipeDTO.setServingSize(67);
+        recipeDTO.setNoOfServing(70);
+        Recipe recipe1 = defaultRecipeService.updateRecipeProps(recipeDTO, recipe);
+
+        assertEquals(recipeDTO.getNoOfServing(), recipe1.getNoOfServing());
+        assertEquals(recipeDTO.getServingSize(), recipe1.getServingSize());
+        assertEquals(recipeDTO.getName(), recipe1.getName());
+        assertEquals(recipeDTO.getType(), recipe1.getType().name());
+
+        int prevServingSize = recipe1.getServingSize();
+        recipeDTO.setName("Another valid name");
+        recipeDTO.setServingSize(0);
+        recipeDTO.setNoOfServing(90);
+        Recipe recipe2 = defaultRecipeService.updateRecipeProps(recipeDTO, recipe);
+
+        assertEquals(recipeDTO.getNoOfServing(), recipe2.getNoOfServing());
+        assertEquals(prevServingSize, recipe2.getServingSize());
+        assertEquals(recipeDTO.getName(), recipe2.getName());
+
+    }
+
+    @Test
+    void updateIngredientProps_shouldThrowError_onWrongInput(){
+        IngredientDTO ingredientDTO = getRecipeDTO().getIngredient().get(0);
+        Ingredient ingredient = getRecipe().getIngredient().get(0);
+
+        ingredientDTO.setName("*****");
+        assertThrows(IllegalArgumentException.class, () -> defaultRecipeService.updateIngredientProps(ingredientDTO, ingredient));
+    }
+
+    @Test
+    void updateIngredientProps_shouldUpdateIngredient_onCorrectInput(){
+        IngredientDTO ingredientDTO = getRecipeDTO().getIngredient().get(0);
+        Ingredient ingredient = getRecipe().getIngredient().get(0);
+
+        ingredientDTO.setName("A valid Ingredient name");
+        ingredientDTO.setUnit("A valid Ingredient unit");
+        ingredientDTO.setVariation("A valid Ingredient variation");
+        ingredientDTO.setQuantity(300);
+        Ingredient ingredient1 = defaultRecipeService.updateIngredientProps(ingredientDTO, ingredient);
+
+        assertEquals(ingredientDTO.getVariation(), ingredient1.getVariation());
+        assertEquals(ingredientDTO.getUnit(), ingredient1.getUnit());
+        assertEquals(ingredientDTO.getVariation(), ingredient1.getVariation());
+        assertEquals(ingredientDTO.getQuantity(), ingredient1.getQuantity());
+    }
+
 }

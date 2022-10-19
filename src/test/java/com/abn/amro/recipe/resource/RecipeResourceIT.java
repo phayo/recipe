@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -91,7 +92,10 @@ class RecipeResourceIT {
         ingredient2.setUnit("Unit 2");
         ingredient2.setQuantity(34);
 
-        recipe.setIngredient(List.of(ingredient2, ingredient));
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        ingredients.add(ingredient2);
+        ingredients.add(ingredient);
+        recipe.setIngredient(ingredients);
 
         return recipe;
     }

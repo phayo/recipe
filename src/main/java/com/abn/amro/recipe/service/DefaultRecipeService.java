@@ -164,7 +164,7 @@ public class DefaultRecipeService implements RecipeService{
 
     protected Recipe updateRecipeProps(RecipeDTO recipeDTO, Recipe recipe){
         if(recipeDTO.getName() != null && !recipeDTO.getName().isBlank()){
-            if(p.matcher(recipeDTO.getName()).find()) throw new IllegalArgumentException("ecipe name should not be empty or contain illegal characters");
+            if(p.matcher(recipeDTO.getName()).find()) throw new IllegalArgumentException("Recipe name should not be empty or contain illegal characters");
             recipe.setName(recipeDTO.getName());
         }
 
@@ -194,7 +194,7 @@ public class DefaultRecipeService implements RecipeService{
         return recipe;
     }
 
-    private Ingredient updateIngredientProps(IngredientDTO ingredientDTO, Ingredient ingredient) {
+    protected Ingredient updateIngredientProps(IngredientDTO ingredientDTO, Ingredient ingredient) {
         if(ingredientDTO.getName() != null && !ingredientDTO.getName().isBlank()){
             if(p.matcher(ingredientDTO.getName()).find()) throw new IllegalArgumentException("ecipe name should not be empty or contain illegal characters");
             ingredient.setName(ingredientDTO.getName());
