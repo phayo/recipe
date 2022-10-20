@@ -2,6 +2,8 @@ package com.abn.amro.recipe.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -12,7 +14,16 @@ import springfox.documentation.spring.web.plugins.Docket;
 import java.util.Collections;
 
 @Configuration
-public class SwaggerConfig {
+public class SwaggerConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addViewControllers(final ViewControllerRegistry registry) {
+        registry.addRedirectViewController("/", "/swagger-ui/index.html");
+        // use setStatusCode(HttpStatus.XYZ) for any custom status code if required, e.g. MOVED_PERMANENTLY
+        registry.addRedirectViewController("/swagger-ui", "/swagger-ui/index.html");
+        // any other alias
+    }
+
 
     private ApiInfo apiInfo() {
         return new ApiInfo("Recipe Rest APIs",
