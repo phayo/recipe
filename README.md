@@ -42,7 +42,7 @@ This is an api to create, search, update and delete recipes
 - #### [Postman Collection File](Recipe.postman_collection.json)
 - #### [Postman Collection Link](https://www.getpostman.com/collections/abefa0738dc6b7b3ae99)
 - #### Search Endpoint: http://localhost:8080/recipe/search?search_term=name:Searchname
-Search_term has a special notation 
+### Search_term has a special notation 
 - *property_name* 
 - *operation* 
 - *value*
@@ -63,8 +63,18 @@ This is the search operation you wish to perform. Example
 ##### Value
 This is the value of the search you are making. 
 
-Put asterisks(*) around a value while using equality operation to search is a string field contains the search term e.g. name:*omlet*
+Put `asterisks(*)` around a value while using equality operation to search is a string field contains the search term e.g. `name:*omlet*`
 
-Put asterisks(*) in front of a value while using equality operation to search is a string field ENDS WITH the search term e.g. name:*let
+Put `asterisks(*)` in front of a value while using equality operation to search is a string field ENDS WITH the search term e.g. `name:*let`
 
-Put asterisks(*) at the back of a value while using equality operation to search is a string field STARTS WITH the search term e.g. name:om*
+Put `asterisks(*)` at the back of a value while using equality operation to search is a string field STARTS WITH the search term e.g. `name:om*`
+##### Combine more than one Search term
+Combine more than one search term by separating with a comma(,).
+#### Example of valid search String.
+- `name:omlet`
+- `ingredient_name!eggs`
+- `instructions:*grill*`
+- `noOfServing>4`
+- `ingredient_quantity<5`
+- `type:VEGAN,instructions:*bake*`
+- `type:NORMAL,ingredient_name:*beef*`
