@@ -38,8 +38,7 @@ This is an api to create, search, update and delete recipes
 - mvn clean verify
 - mvn spring-boot:run
 ### Available Endpoints
-- #### Base URL: http://localhost:8080/
-- #### Swagger URL: http://localhost:8080/swagger-ui/index.html
+- #### Azure URL: https://recipeapiabn.azurewebsites.net/
 - #### [Postman Collection File](Recipe.postman_collection.json)
 - #### [Postman Collection Link](https://www.getpostman.com/collections/abefa0738dc6b7b3ae99)
 - #### Search Endpoint: http://localhost:8080/recipe/search?search_term=name:Searchname
