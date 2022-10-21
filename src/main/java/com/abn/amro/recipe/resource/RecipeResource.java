@@ -74,7 +74,7 @@ public class RecipeResource {
     }
 
     @PutMapping("/{id}/ingredient/{IngredientId}")
-    public ResponseEntity<?> updateRecipe(@PathVariable("id") String recipeId, @PathVariable("IngredientId") String ingredientId, @RequestBody IngredientDTO ingredientDTO) {
+    public ResponseEntity<?> updateRecipeIngredient(@PathVariable("id") String recipeId, @PathVariable("IngredientId") String ingredientId, @RequestBody IngredientDTO ingredientDTO) {
         LOG.info("Receive REST request to update ingredient {} for recipe of id {} with object {}",ingredientId, recipeId, ingredientDTO);
         long recipeID;
         long ingredientID;
@@ -88,7 +88,7 @@ public class RecipeResource {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> updateRecipe(@PathVariable("id") String id) {
+    public ResponseEntity<?> deleteRecipe(@PathVariable("id") String id) {
         LOG.info("Receive REST request to delete recipe of id {}", id);
         long recipeId;
         try{
